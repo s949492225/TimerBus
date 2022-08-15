@@ -2,45 +2,52 @@ package com.syiyi.timebus.core
 
 import java.util.*
 
+/**
+ * 以执行时间排序的优先队列
+ */
 class TimerTaskQueue {
     private val queue = LinkedList<TimerTask>()
 
 
+    /**
+     * 向队列添加任务
+     * 任务按照执行时间排序,时间越小就先执行,则放到队列的前面
+     */
     fun add(task: TimerTask) {
         synchronized(this) {
             //空则添加
             val headTask = queue.peek()
             if (headTask == null) {
                 queue.addFirst(task)
-            } else {
-                //否则按执行时间排序
-                queue.iterator().apply {
-                    while (this.hasNext()) {
-                        val currentTask = this.next()
-                        val currentIndex = queue.indexOf(currentTask)
-                        if (currentTask.runTime > task.runTime) {
-                            queue.add(currentIndex, task)
-                            break
-                        } else if (currentTask.runTime <= task.runTime) {
-                            if (currentIndex >= queue.size - 1) {
-                                //最后一个了,则直接添加
-                                queue.addLast(task)
-                                break
-                            } else {
-                                val nextTask = queue[currentIndex + 1]
-                                if (nextTask.runTime <= task.runTime) {
-                                    //下一个比要添加的先执行,则找下一个
-                                    continue
-                                } else {
-                                    //添加的比下一个先执行,放到下一个前面
-                                    queue.add(currentIndex, task)
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
+                return
             }
+            //否则按执行时间排序
+            val iterator = queue.iterator()
+            while (iterator.hasNext()) {
+                val currentTask = iterator.next()
+                val currentIndex = queue.indexOf(currentTask)
+                //当前的任务先执行
+                if (currentTask.runTime > task.runTime) {
+                    queue.add(currentIndex, task)
+                    break
+                }
+                //当前的任务后执行
+                if (currentIndex >= queue.size - 1) {
+                    //最后一个了,则直接添加
+                    queue.addLast(task)
+                    break
+                }
+                //和下一个比
+                val nextTask = queue[currentIndex + 1]
+                if (nextTask.runTime <= task.runTime) {
+                    //当前的比下一个后执行,则找下一个
+                    continue
+                }
+                //当前的比下一个先执行,放到下一个前面
+                queue.add(currentIndex, task)
+                break
+            }
+
         }
     }
 
