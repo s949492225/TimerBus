@@ -56,6 +56,7 @@ interface TimerLoop : Runnable {
                 queue.remove(task.taskKey)?.apply {
                     timerTaskCache.add(this)
                 }
+                LockSupport.unpark(this.currentThread)
             }
 
             override fun run() {
