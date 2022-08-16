@@ -3,8 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
 }
-group = 'com.syiyi'
-version = '1.0.0'
+
 android {
     compileSdk 32
 
@@ -41,9 +40,9 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-                groupId = group
+                groupId = "com.syiyi"
                 artifactId = 'timerbus'
-                version = version
+                version = '1.0.0'
             }
         }
     }
