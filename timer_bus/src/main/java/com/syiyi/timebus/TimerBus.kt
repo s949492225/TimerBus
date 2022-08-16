@@ -28,7 +28,6 @@ object TimerBus {
     /**
      * 生成一个支持计时的flow
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     @JvmStatic
     fun scheduleFlow(
         taskName: String = "anonymity",
@@ -37,7 +36,7 @@ object TimerBus {
         timeUnit: TimeUnit = TimeUnit.SECONDS,
     ) = channelFlow {
         val taskCall = schedule(taskName, period, delay, timeUnit) { taskName, taskKey ->
-            offer(TaskInfo(taskName, taskKey))
+            trySend(TaskInfo(taskName, taskKey))
         }
         awaitClose {
             taskCall.cancel()

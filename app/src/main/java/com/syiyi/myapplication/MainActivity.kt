@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         val content: TextView = findViewById(R.id.content)
         button.setOnClickListener {
             originUse(content)
-//            flowUse(content)
+            flowUse(content)
         }
     }
 
@@ -33,9 +33,9 @@ class MainActivity : AppCompatActivity() {
             period = 3,
             delay = 1,
             timeUnit = TimeUnit.SECONDS
-        ) { _, taskKey ->
+        ) { taskName, taskKey ->
             content.post {
-                content.text = "task_key${taskKey}\n${content.text}"
+                content.text = "task_key${taskKey}--task_name:${taskName}\n${content.text}"
             }
         }
     }
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     replay = 1,
                     started = SharingStarted.WhileSubscribed()
                 ).onEach {
-                    content.text = "task_key${it.taskKey}\n${content.text}"
+                    content.text = "task_key${it.taskKey}--task_name:${it.taskName}\n${content.text}"
                 }.collect()
             }
         }

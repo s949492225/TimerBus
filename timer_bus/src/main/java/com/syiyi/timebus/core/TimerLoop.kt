@@ -30,7 +30,10 @@ interface TimerLoop : Runnable {
             private var currentThread: Thread? = null
 
             override fun start() {
-                thread {
+                thread(
+                    name = "TimerBus loop thread",
+                    priority = Thread.MIN_PRIORITY
+                ) {
                     currentThread = Thread.currentThread()
                     logger.info("TimerLoop init success")
                     this.run()
