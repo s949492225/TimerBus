@@ -1,7 +1,6 @@
 package com.syiyi.timebus.core
 
 import com.syiyi.timebus.core.log.Logger
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
 import kotlin.concurrent.thread
 
@@ -23,7 +22,8 @@ interface TimerLoop : Runnable {
             override val timerTaskCache: TimerTaskCache,
             override var logger: Logger
         ) : TimerLoop {
-            private val exit = AtomicBoolean(false)
+            @Volatile
+            private var exit = false
             private val queue = TimerTaskQueue()
 
             @Volatile
@@ -38,14 +38,15 @@ interface TimerLoop : Runnable {
             }
 
             override fun exit() {
-                exit.set(true)
+                exit = true
+                LockSupport.unpark(this.currentThread)
             }
 
             override fun add(task: TimerTask) {
                 while (null == this.currentThread) {
                     //wait init
                 }
-                if (exit.get()) {
+                if (exit) {
                     return
                 }
                 queue.add(task)
@@ -62,7 +63,6 @@ interface TimerLoop : Runnable {
             override fun run() {
                 try {
                     while (true) {
-                        val exit = exit.get()
                         if (exit) {
                             queue.clear()
                             break
